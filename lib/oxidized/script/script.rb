@@ -11,7 +11,10 @@ module Oxidized
     # @param [String] command command to be sent
     # @return [String] output for command
     def cmd command
-      @model.cmd command
+      out = ''
+      out += "## OXS - #{command}\n" if @verbose
+      out += @model.cmd command
+      out
     end
 
     # disconnects from ssh/telnet session
@@ -38,7 +41,8 @@ module Oxidized
       timeout  = opts.delete :timeout
       username = opts.delete :username
       password = opts.delete :password
-      enable  =  opts.delete :enable
+      enable   = opts.delete :enable
+      @verbose = opts.delete :verbose
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
       Oxidized.mgr = Manager.new
       @node = if model

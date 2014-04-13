@@ -36,6 +36,7 @@ module Oxidized
           on 'p=', '--password', 'password to use'
           on 't=', '--timeout',  'timeout value to use'
           on 'e=', '--enable',   'enable password to use'
+          on 'v',  '--verbose',  'verbose output, e.g. show commands sent'
           on 'd',  '--debug',    'turn on debugging'
         end
         [slop.parse!, slop]
@@ -44,11 +45,9 @@ module Oxidized
       def connect
         opts = {}
         opts[:host]     = @host
-        opts[:model]    = @opts[:model] if @opts[:model]
-        opts[:username] = @opts[:username] if @opts[:username]
-        opts[:password] = @opts[:password] if @opts[:password]
-        opts[:timeout]  = @opts[:timeout].to_i if @opts[:timeout]
-        opts[:enable]   = @opts[:enable] if @opts[:enable]
+        [:model, :username, :passsword, :timeout, :enable, :verbose].each do |key|
+          opts[key] = @opts[key] if @opts[key]
+        end
         @oxs = Script.new opts
       end
 
