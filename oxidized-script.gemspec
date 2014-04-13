@@ -12,6 +12,6 @@ Gem::Specification.new do |s|
   s.executables       = %w( oxs )
   s.require_path      = 'lib'
 
-  #s.add_dependency 'oxidized'
+  s.add_dependency 'oxidized'
   s.add_dependency 'slop'
 end
