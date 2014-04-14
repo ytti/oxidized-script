@@ -18,27 +18,32 @@ module Oxidized
       private
 
       def initialize
-        args, @opts = opts_parse
+        @args, @opts = opts_parse load_dynamic
         CFG.debug = true if @opts[:debug]
-        @host = args.shift
-        @cmd  = args.shift if args
+        @host = @args.shift
+        @cmd  = @args.shift if @args
         @oxs  = nil
         raise NothingToDo, 'no host given' if not @host
         raise NothingToDo, 'nothing to do, give command or -x' if not @cmd and not @opts[:commands]
       end
 
-      def opts_parse
-        slop = Slop.parse(:help=>true) do
-          banner 'Usage: oxs [options] hostname [command]'
-          on 'm=', '--model',    'host model (ios, junos, etc), otherwise discovered from Oxidized source'
-          on 'x=', '--commands', 'commands file to be sent'
-          on 'u=', '--username', 'username to use'
-          on 'p=', '--password', 'password to use'
-          on 't=', '--timeout',  'timeout value to use'
-          on 'e=', '--enable',   'enable password to use'
-          on 'v',  '--verbose',  'verbose output, e.g. show commands sent'
-          on 'd',  '--debug',    'turn on debugging'
+      def opts_parse cmds
+        slop = Slop.new(:help=>true)
+        slop.banner 'Usage: oxs [options] hostname [command]'
+        slop.on 'm=', '--model',    'host model (ios, junos, etc), otherwise discovered from Oxidized source'
+        slop.on 'x=', '--commands', 'commands file to be sent'
+        slop.on 'u=', '--username', 'username to use'
+        slop.on 'p=', '--password', 'password to use'
+        slop.on 't=', '--timeout',  'timeout value to use'
+        slop.on 'e=', '--enable',   'enable password to use'
+        slop.on 'v',  '--verbose',  'verbose output, e.g. show commands sent'
+        slop.on 'd',  '--debug',    'turn on debugging'
+        cmds.each do |cmd|
+          slop.on cmd[:name], cmd[:description] do
+            cmd[:class].run(:args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd)
+          end
         end
+        slop.parse
         [slop.parse!, slop]
       end
 
@@ -59,6 +64,21 @@ module Oxidized
           out += @oxs.cmd line
         end
         out
+      end
+
+      def load_dynamic
+        cmds = []
+        files = File.dirname __FILE__
+        files = File.join files, 'commands', '*.rb'
+        files = Dir.glob files
+        files.each { |file| require_relative file }
+        Script::Command.constants.each do |cmd|
+          cmd = Script::Command.const_get cmd
+          name = cmd.const_get :Name
+          desc = cmd.const_get :Description
+          cmds << {:class=>cmd, :name=>name, :description=>desc}
+        end
+        cmds
       end
 
     end
