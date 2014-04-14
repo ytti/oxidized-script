@@ -27,12 +27,13 @@ module Oxidized
     private
 
     # @param [Hash] opts options for Oxidized::Script
-    # @option opts [String] :host      hostname or ip address for Oxidized::Node
-    # @option opts [String] :model     node model (ios, junos etc) if defined, nodes are not loaded from source
-    # @option opts [Fixnum] :timeout   oxidized timeout
-    # @option opts [String  :username  username for login
-    # @option opts [String  :passsword password for login
-    # @option opts [String  :enable    enable password to use
+    # @option opts [String]  :host      hostname or ip address for Oxidized::Node
+    # @option opts [String]  :model     node model (ios, junos etc) if defined, nodes are not loaded from source
+    # @option opts [Fixnum]  :timeout   oxidized timeout
+    # @option opts [String]  :username  username for login
+    # @option opts [String]  :passsword password for login
+    # @option opts [String]  :enable    enable password to use
+    # @option opts [boolean] :verbose   extra output, e.g. show command given in output
     # @yieldreturn [self] if called in block, returns self and disconnnects session after exiting block
     # @return [void]
     def initialize opts, &block
@@ -53,7 +54,7 @@ module Oxidized
       raise NoNode, 'node not found' unless @node
       @node.auth[:username] = username if username
       @node.auth[:password] = password if password
-      CFG.vars[:enable] = enable if enable
+      CFG.vars.enable = enable if enable
       CFG.timeout = timeout if timeout
       @model = @node.model
       @input = nil
