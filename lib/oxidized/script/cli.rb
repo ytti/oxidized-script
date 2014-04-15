@@ -50,7 +50,7 @@ module Oxidized
       def connect
         opts = {}
         opts[:host]     = @host
-        [:model, :username, :passsword, :timeout, :enable, :verbose].each do |key|
+        [:model, :username, :password, :timeout, :enable, :verbose].each do |key|
           opts[key] = @opts[key] if @opts[key]
         end
         @oxs = Script.new opts
@@ -60,6 +60,7 @@ module Oxidized
         out = ''
         file = file == '-' ? $stdin : File.read(file)
         file.each_line do |line|
+          line.chomp!
           line.sub!(/\\n/, "\n") # tread escaped newline as newline
           out += @oxs.cmd line
         end
