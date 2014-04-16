@@ -30,14 +30,15 @@ module Oxidized
       def opts_parse cmds
         slop = Slop.new(:help=>true)
         slop.banner 'Usage: oxs [options] hostname [command]'
-        slop.on 'm=', '--model',    'host model (ios, junos, etc), otherwise discovered from Oxidized source'
-        slop.on 'x=', '--commands', 'commands file to be sent'
-        slop.on 'u=', '--username', 'username to use'
-        slop.on 'p=', '--password', 'password to use'
-        slop.on 't=', '--timeout',  'timeout value to use'
-        slop.on 'e=', '--enable',   'enable password to use'
-        slop.on 'v',  '--verbose',  'verbose output, e.g. show commands sent'
-        slop.on 'd',  '--debug',    'turn on debugging'
+        slop.on 'm=', '--model',     'host model (ios, junos, etc), otherwise discovered from Oxidized source'
+        slop.on 'x=', '--commands',  'commands file to be sent'
+        slop.on 'u=', '--username',  'username to use'
+        slop.on 'p=', '--password',  'password to use'
+        slop.on 't=', '--timeout',   'timeout value to use'
+        slop.on 'e=', '--enable',    'enable password to use'
+        slop.on 'c=', '--community', 'snmp community to use for discovery'
+        slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
+        slop.on 'd',  '--debug',     'turn on debugging'
         cmds.each do |cmd|
           slop.on cmd[:name], cmd[:description] do
             cmd[:class].run(:args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd)
@@ -50,7 +51,7 @@ module Oxidized
       def connect
         opts = {}
         opts[:host]     = @host
-        [:model, :username, :password, :timeout, :enable, :verbose].each do |key|
+        [:model, :username, :password, :timeout, :enable, :verbose, :community].each do |key|
           opts[key] = @opts[key] if @opts[key]
         end
         @oxs = Script.new opts

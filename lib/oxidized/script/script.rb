@@ -33,17 +33,19 @@ module Oxidized
     # @option opts [String]  :username  username for login
     # @option opts [String]  :passsword password for login
     # @option opts [String]  :enable    enable password to use
+    # @option opts [String]  :community community to use for discovery
     # @option opts [boolean] :verbose   extra output, e.g. show command given in output
     # @yieldreturn [self] if called in block, returns self and disconnnects session after exiting block
     # @return [void]
     def initialize opts, &block
-      host     = opts.delete :host
-      model    = opts.delete :model
-      timeout  = opts.delete :timeout
-      username = opts.delete :username
-      password = opts.delete :password
-      enable   = opts.delete :enable
-      @verbose = opts.delete :verbose
+      host        = opts.delete :host
+      model       = opts.delete :model
+      timeout     = opts.delete :timeout
+      username    = opts.delete :username
+      password    = opts.delete :password
+      enable      = opts.delete :enable
+      community   = opts.delete :community
+      @verbose    = opts.delete :verbose
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
       Oxidized.mgr = Manager.new
       @node = if model
@@ -51,7 +53,17 @@ module Oxidized
       else
         Nodes.new(:node=>host).first
       end
-      raise NoNode, 'node not found' unless @node
+      if not @node
+        begin
+          require 'corona'
+          community ||= Corona::CFG.community
+        rescue LoadError
+          raise NoNode, 'node not found'
+        end
+        node = Corona.poll :host=>host, :community=>community
+        raise NoNode, 'node not found' unless node
+        @node = Node.new :name=>host, :model=>node[:model]
+      end
       @node.auth[:username] = username if username
       @node.auth[:password] = password if password
       CFG.vars.enable = enable if enable
