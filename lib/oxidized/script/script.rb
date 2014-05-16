@@ -92,7 +92,7 @@ module Oxidized
         end
       end
       @input = @node.model.input
-      NoConnection.error = @node.error
+      NoConnection.node_error = @node.error
       raise NoConnection, 'unable to connect' unless @input.connected?
       @input.connect_cli
     end
