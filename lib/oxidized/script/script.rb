@@ -4,9 +4,14 @@ module Oxidized
   require 'oxidized'
   class Script
     class ScriptError   < OxidizedError; end
-    class NoConnection  < ScriptError;   end
     class NoNode        < ScriptError;   end
     class InvalidOption < ScriptError;   end
+    class NoConnection  < ScriptError
+      class << self
+        attr_accessor :node_error
+      end
+    end
+
 
     # @param [String] command command to be sent
     # @return [String] output for command
@@ -87,6 +92,7 @@ module Oxidized
         end
       end
       @input = @node.model.input
+      NoConnection.error = @node.error
       raise NoConnection, 'unable to connect' unless @input.connected?
       @input.connect_cli
     end
