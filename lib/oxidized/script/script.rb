@@ -39,6 +39,7 @@ module Oxidized
     # @option opts [String]  :passsword password for login
     # @option opts [String]  :enable    enable password to use
     # @option opts [String]  :community community to use for discovery
+    # @option opts [String]  :protocols protocols to use to connect, default "ssh ,telnet"
     # @option opts [boolean] :verbose   extra output, e.g. show command given in output
     # @yieldreturn [self] if called in block, returns self and disconnnects session after exiting block
     # @return [void]
@@ -51,6 +52,7 @@ module Oxidized
       enable      = opts.delete :enable
       community   = opts.delete :community
       @verbose    = opts.delete :verbose
+      Oxidized.CFG.input.default = opts.delete :protocols
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
       Oxidized.mgr = Manager.new
       @node = if model
