@@ -37,7 +37,7 @@ module Oxidized
         slop.on 't=', '--timeout',   'timeout value to use'
         slop.on 'e=', '--enable',    'enable password to use'
         slop.on 'c=', '--community', 'snmp community to use for discovery'
-        slop.on 'p=', '--protocols', 'protocols to use, default "ssh, telnet"'
+        slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
         cmds.each do |cmd|
