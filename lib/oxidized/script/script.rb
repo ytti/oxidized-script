@@ -83,17 +83,18 @@ module Oxidized
     end
 
     def connect
+      node_error = nil
       @node.input.each do |input|
         begin
           @node.model.input = input.new
           @node.model.input.connect @node
           break
         rescue => error
-          @node.error = error
+          node_error = error
         end
       end
       @input = @node.model.input
-      NoConnection.node_error = @node.error
+      NoConnection.node_error = node_error
       raise NoConnection, 'unable to connect' unless @input.connected?
       @input.connect_cli
     end
