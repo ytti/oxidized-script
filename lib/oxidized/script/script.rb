@@ -85,14 +85,14 @@ module Oxidized
     end
 
     def connect
-      node_error = nil
+      node_error = {}
       @node.input.each do |input|
         begin
           @node.model.input = input.new
           @node.model.input.connect @node
           break
         rescue => error
-          node_error = error
+          node_error[input.class] = error
         end
       end
       @input = @node.model.input
