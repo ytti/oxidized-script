@@ -88,7 +88,8 @@ module Oxidized
           @node.model.input = input.new
           @node.model.input.connect @node
           break
-        rescue
+        rescue => error
+          @node.error = error
         end
       end
       @input = @node.model.input
