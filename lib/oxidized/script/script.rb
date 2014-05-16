@@ -92,7 +92,7 @@ module Oxidized
           @node.model.input.connect @node
           break
         rescue => error
-          node_error[input.class] = error
+          node_error[input] = error
         end
       end
       @input = @node.model.input
