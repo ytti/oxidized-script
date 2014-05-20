@@ -7,9 +7,7 @@ module Oxidized
     class NoNode        < ScriptError;   end
     class InvalidOption < ScriptError;   end
     class NoConnection  < ScriptError
-      class << self
-        attr_accessor :node_error
-      end
+      attr_accessor :node_error
     end
 
 
@@ -52,7 +50,7 @@ module Oxidized
       enable      = opts.delete :enable
       community   = opts.delete :community
       @verbose    = opts.delete :verbose
-      Oxidized.CFG.input.default = opts.delete :protocols
+      CFG.input.default = opts.delete :protocols if :protocols
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
       Oxidized.mgr = Manager.new
       @node = if model
@@ -96,8 +94,9 @@ module Oxidized
         end
       end
       @input = @node.model.input
-      NoConnection.node_error = node_error
-      raise NoConnection, 'unable to connect' unless @input.connected?
+      err = NoConnection.new
+      err.node_error = node_error
+      raise err, 'unable to connect' unless @input.connected?
       @input.connect_cli
     end
   end
