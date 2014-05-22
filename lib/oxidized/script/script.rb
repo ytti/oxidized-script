@@ -50,7 +50,7 @@ module Oxidized
       enable      = opts.delete :enable
       community   = opts.delete :community
       @verbose    = opts.delete :verbose
-      CFG.input.default = opts.delete :protocols if :protocols
+      CFG.input.default = opts.delete :protocols if opts[:protocols]
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
       Oxidized.mgr = Manager.new
       @node = if model
