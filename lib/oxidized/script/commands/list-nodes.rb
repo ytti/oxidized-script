@@ -1,13 +1,22 @@
 module Oxidized
   class Script
     module Command
-      class ListNodes
+      class ListNodes < Base
         Name        = 'list-nodes'
         Description = 'list nodes in oxidized source'
 
+        # this is not needed this this command, just shown how todo more
+        # complex commands, this could use slop sub-commands etc. As long as it
+        # sets cli.cmd_class when you want to run it, it gets ran after parsing
+        # commandline
+        def self.cmdline slop, cli
+          slop.on "--#{Name}", Description do
+            cli.cmd_class = self
+          end
+        end
+
         def self.run opts={}
           puts new(opts).nodes
-          exit
         end
 
         def nodes

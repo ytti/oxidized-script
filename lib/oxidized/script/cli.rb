@@ -3,6 +3,7 @@ module Oxidized
   require 'slop'
   class Script
     class CLI
+      attr_accessor :cmd_class
       class CLIError < ScriptError; end
       class NothingToDo < ScriptError; end
 
@@ -20,11 +21,16 @@ module Oxidized
       def initialize
         @args, @opts = opts_parse load_dynamic
         CFG.debug = true if @opts[:debug]
-        @host = @args.shift
-        @cmd  = @args.shift if @args
-        @oxs  = nil
-        raise NothingToDo, 'no host given' if not @host
-        raise NothingToDo, 'nothing to do, give command or -x' if not @cmd and not @opts[:commands]
+        if @cmd_class
+          @cmd_class.run :args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd
+          exit 0
+        else
+          @host = @args.shift
+          @cmd  = @args.shift if @args
+          @oxs  = nil
+          raise NothingToDo, 'no host given' if not @host
+          raise NothingToDo, 'nothing to do, give command or -x' if not @cmd and not @opts[:commands]
+        end
       end
 
       def opts_parse cmds
@@ -41,8 +47,12 @@ module Oxidized
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
         cmds.each do |cmd|
-          slop.on cmd[:name], cmd[:description] do
-            cmd[:class].run(:args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd)
+          if cmd[:class].respond_to? :cmdline
+            cmd[:class].cmdline slop, self
+          else
+            slop.on cmd[:name], cmd[:description] do
+              @cmd_class = cmd[:class]
+            end
           end
         end
         slop.parse
@@ -76,6 +86,7 @@ module Oxidized
         files = Dir.glob files
         files.each { |file| require_relative file }
         Script::Command.constants.each do |cmd|
+          next if cmd == :Base
           cmd = Script::Command.const_get cmd
           name = cmd.const_get :Name
           desc = cmd.const_get :Description

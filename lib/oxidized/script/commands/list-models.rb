@@ -1,13 +1,12 @@
 module Oxidized
   class Script
     module Command
-      class ListModels
+      class ListModels < Base
         Name        = 'list-models'
         Description = 'list supported models'
 
         def self.run opts={}
           puts new(opts).models
-          exit
         end
 
         def models

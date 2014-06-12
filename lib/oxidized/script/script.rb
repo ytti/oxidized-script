@@ -2,6 +2,7 @@
 
 module Oxidized
   require 'oxidized'
+  require_relative 'command'
   class Script
     class ScriptError   < OxidizedError; end
     class NoNode        < ScriptError;   end
