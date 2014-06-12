@@ -46,6 +46,7 @@ module Oxidized
         slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
+        slop.on :terse, 'display clean output'
         cmds.each do |cmd|
           if cmd[:class].respond_to? :cmdline
             cmd[:class].cmdline slop, self

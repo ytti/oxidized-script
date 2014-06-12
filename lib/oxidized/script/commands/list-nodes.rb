@@ -16,7 +16,11 @@ module Oxidized
         end
 
         def self.run opts={}
-          puts new(opts).nodes
+          if opts[:opts][:terse] # find if 'terse' global option is set
+            puts new(opts).nodes_terse
+          else
+            puts new(opts).nodes
+          end
         end
 
         def nodes
@@ -30,6 +34,15 @@ module Oxidized
               value = value.class if name == 'model'
               out += "  %10s => %s\n" % [name, value.to_s]
             end
+          end
+          out
+        end
+
+        def nodes_terse
+          out = ''
+          i = 0
+          Nodes.new.each do |node|
+            out += "#{i += 1} - #{node.name}\n"
           end
           out
         end
