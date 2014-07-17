@@ -4,6 +4,8 @@ module Oxidized
   require 'oxidized'
   require_relative 'command'
   class Script
+    attr_reader :model
+
     class ScriptError   < OxidizedError; end
     class NoNode        < ScriptError;   end
     class InvalidOption < ScriptError;   end
