@@ -55,7 +55,13 @@ module Oxidized
       @verbose    = opts.delete :verbose
       CFG.input.default = opts.delete :protocols if opts[:protocols]
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
-      Oxidized.mgr = Manager.new
+
+      @@oxi ||= false
+      if not @@oxi
+        Oxidized.mgr = Manager.new
+        @@oxi = true
+      end
+
       @node = if model
         Node.new(:name=>host, :model=>model)
       else
