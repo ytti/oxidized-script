@@ -19,7 +19,8 @@ module Oxidized
     def cmd command
       out = ''
       out += "## OXS - #{command}\n" if @verbose
-      out += @model.cmd command
+      cmd_out = @model.cmd command
+      out += cmd_out if cmd_out
       out
     end
 
