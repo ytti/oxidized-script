@@ -1,6 +1,7 @@
 module Oxidized
   require_relative 'script'
   require 'slop'
+
   class Script
     class CLI
       attr_accessor :cmd_class
@@ -20,7 +21,10 @@ module Oxidized
 
       def initialize
         @args, @opts = opts_parse load_dynamic
-        CFG.debug = true if @opts[:debug]
+
+        Config.load(@opts)
+        Oxidized.setup_logger
+
         if @cmd_class
           @cmd_class.run :args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd
           exit 0

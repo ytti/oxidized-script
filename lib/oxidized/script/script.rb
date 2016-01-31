@@ -54,7 +54,7 @@ module Oxidized
       enable      = opts.delete :enable
       community   = opts.delete :community
       @verbose    = opts.delete :verbose
-      CFG.input.default = opts.delete :protocols if opts[:protocols]
+      Oxidized.config.input.default = opts.delete :protocols if opts[:protocols]
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
 
       @@oxi ||= false
@@ -81,8 +81,8 @@ module Oxidized
       end
       @node.auth[:username] = username if username
       @node.auth[:password] = password if password
-      CFG.vars.enable = enable if enable
-      CFG.timeout = timeout if timeout
+      Oxidized.config.vars.enable = enable if enable
+      Oxidized.config.timeout = timeout if timeout
       @model = @node.model
       @input = nil
       connect
