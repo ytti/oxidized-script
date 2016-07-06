@@ -25,6 +25,10 @@ module Oxidized
         Config.load(@opts)
         Oxidized.setup_logger
 
+        if @opts[:commands]
+          Oxidized.config.vars.ssh_no_exec = true
+        end
+
         if @cmd_class
           @cmd_class.run :args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd
           exit 0
