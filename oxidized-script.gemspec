@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = 'oxidized-script'
-  s.version           = '0.1.2'
+  s.version           = '0.2.0'
   s.licenses          = %w( Apache-2.0 )
   s.platform          = Gem::Platform::RUBY
   s.authors           = [ 'Saku Ytti' ]
@@ -13,6 +13,6 @@ Gem::Specification.new do |s|
   s.executables       = %w( oxs )
   s.require_path      = 'lib'
 
-  s.add_runtime_dependency 'oxidized', '~> 0.11'
+  s.add_runtime_dependency 'oxidized', '~> 0.15'
   s.add_runtime_dependency 'slop',     '~> 3.5'
 end
