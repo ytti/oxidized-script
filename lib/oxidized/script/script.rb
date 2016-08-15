@@ -64,10 +64,10 @@ module Oxidized
       end
 
       @node = if model
-        Node.new(:name=>host, :model=>model)
-      else
-        Nodes.new(:node=>host).first
-      end
+                Node.new(:name=>host, :model=>model)
+              else
+                Nodes.new(:node=>host).first
+              end
       if not @node
         begin
           require 'corona'
