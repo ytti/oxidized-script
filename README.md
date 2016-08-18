@@ -29,14 +29,22 @@ ICMP redirect cache is empty
 %IPv4 CEF not running
 [fisakytt@lan-login1 ~]% oxs --help
 Usage: oxs [options] hostname [command]
-    -m, --model         host model (ios, junos, etc), otherwise discovered from Oxidized source
-    -x, --commands      commands file to be sent
-    -u, --username      username to use
-    -p, --password      password to use
-    -t, --timeout       timeout value to use
-    -e, --enable        enable password to use
-    -d, --debug         turn on debugging
-    -h, --help          Display this help message.
+    -m, --model            host model (ios, junos, etc), otherwise discovered from Oxidized source
+    -x, --commands         commands file to be sent
+    -u, --username         username to use
+    -p, --password         password to use
+    -t, --timeout          timeout value to use
+    -e, --enable           enable password to use
+    -c, --community        snmp community to use for discovery
+    -g, --group            group to run commands on
+    -r, --threads          specify ammount of threads to use for running group (default: 1)
+        --protocols        protocols to use, default "ssh, telnet"
+    -v, --verbose          verbose output, e.g. show commands sent
+    -d, --debug            turn on debugging
+        --terse            display clean output
+        --list-models      list supported models
+        --list-nodes       list nodes in oxidized source
+    -h, --help             Display this help message.
 [fisakytt@lan-login1 ~]% 
 ```
 

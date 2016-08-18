@@ -1,6 +1,7 @@
 module Oxidized
   require_relative 'script'
   require 'slop'
+  require 'thread'
 
   class Script
     class CLI
@@ -10,30 +11,38 @@ module Oxidized
 
       def run
         if @group
-          puts "running list for nodes in: " + @group
+          puts 'running list for nodes in: ' + @group if @verbose
           nodes = run_group @group
 
-          nodes.each do |node|
-            begin
-              @host = node
-              puts "connecting to: " + @host
-              connect
-              if @opts[:commands]
-                puts run_file @opts[:commands]
-              elsif @cmd
-                puts @oxs.cmd @cmd
+          work_q = Queue.new
+          nodes.each{|node| work_q.push node}
+          workers = (0...@threads.to_i).map do
+            Thread.new do
+              begin
+                while node = work_q.pop(true)
+                  begin
+                    @host = node
+                    connect
+                    if @opts[:commands]
+                      puts run_file @opts[:commands]
+                    elsif @cmd
+                      puts @oxs.cmd @cmd
+                    end
+                  rescue
+                    puts "Couldn't connect to: " + node
+                  end
+                end
+              rescue ThreadError
               end
-            rescue
-              puts "couldn't connect to: " + @host
-              next
             end
           end
+          workers.map(&:join)
         else
           connect
           if @opts[:commands]
-            run_file @opts[:commands]
+            puts run_file @opts[:commands]
           elsif @cmd
-            @oxs.cmd @cmd
+            puts @oxs.cmd @cmd
           end
         end
       end
@@ -77,6 +86,7 @@ module Oxidized
         slop.on 'e=', '--enable',    'enable password to use'
         slop.on 'c=', '--community', 'snmp community to use for discovery'
         slop.on 'g=', '--group',     'group to run commands on'
+        slop.on 'r=', '--threads',   'specify ammount of threads to use for running group', default: '1'
         slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
@@ -92,6 +102,8 @@ module Oxidized
         end
         slop.parse
         @group = slop[:group]
+        @threads = slop[:threads]
+        @verbose = slop[:verbose]
         [slop.parse!, slop]
       end
 
