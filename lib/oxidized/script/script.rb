@@ -53,6 +53,7 @@ module Oxidized
       password    = opts.delete :password
       enable      = opts.delete :enable
       community   = opts.delete :community
+      group       = opts.delete :group
       @verbose    = opts.delete :verbose
       Oxidized.config.input.default = opts.delete :protocols if opts[:protocols]
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?

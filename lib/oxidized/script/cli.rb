@@ -9,11 +9,32 @@ module Oxidized
       class NothingToDo < ScriptError; end
 
       def run
-        connect
-        if @opts[:commands]
-          run_file @opts[:commands]
-        elsif @cmd
-          @oxs.cmd @cmd
+        if @group
+          puts "running list for nodes in: " + @group
+          nodes = run_group @group
+
+          nodes.each do |node|
+            begin
+              @host = node
+              puts "connecting to: " + @host
+              connect
+              if @opts[:commands]
+                puts run_file @opts[:commands]
+              elsif @cmd
+                puts @oxs.cmd @cmd
+              end
+            rescue
+              puts "couldn't connect to: " + @host
+              next
+            end
+          end
+        else
+          connect
+          if @opts[:commands]
+            run_file @opts[:commands]
+          elsif @cmd
+            @oxs.cmd @cmd
+          end
         end
       end
 
@@ -33,10 +54,14 @@ module Oxidized
           @cmd_class.run :args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd
           exit 0
         else
-          @host = @args.shift
-          @cmd  = @args.shift if @args
+          if @group
+            @cmd = @args.shift
+          else
+            @host = @args.shift
+            @cmd  = @args.shift if @args
+          end
           @oxs  = nil
-          raise NothingToDo, 'no host given' if not @host
+          raise NothingToDo, 'no host given' if not @host and not @group
           raise NothingToDo, 'nothing to do, give command or -x' if not @cmd and not @opts[:commands]
         end
       end
@@ -51,7 +76,7 @@ module Oxidized
         slop.on 't=', '--timeout',   'timeout value to use'
         slop.on 'e=', '--enable',    'enable password to use'
         slop.on 'c=', '--community', 'snmp community to use for discovery'
-        slop.on 'g=', '--group', 'group to run commands on'
+        slop.on 'g=', '--group',     'group to run commands on'
         slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
@@ -66,6 +91,7 @@ module Oxidized
           end
         end
         slop.parse
+        @group = slop[:group]
         [slop.parse!, slop]
       end
 
@@ -103,6 +129,16 @@ module Oxidized
           cmds << {:class=>cmd, :name=>name, :description=>desc}
         end
         cmds
+      end
+
+      def run_group group
+        Oxidized.mgr = Manager.new
+        out = []
+        Nodes.new.each do |node|
+          next unless group == node.group
+          out << node.name
+        end
+        out
       end
 
     end
