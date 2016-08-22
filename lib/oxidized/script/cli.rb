@@ -10,10 +10,8 @@ module Oxidized
       class NothingToDo < ScriptError; end
 
       def run
-        if @group
-          puts 'running list for nodes in: ' + @group if @verbose
-          nodes = run_group @group
-
+        if @group or @regex
+          nodes = get_hosts
           work_q = Queue.new
           nodes.each{|node| work_q.push node}
           workers = (0...@threads.to_i).map do
@@ -63,14 +61,14 @@ module Oxidized
           @cmd_class.run :args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd
           exit 0
         else
-          if @group
+          if @group or @regex
             @cmd = @args.shift
           else
             @host = @args.shift
             @cmd  = @args.shift if @args
           end
           @oxs  = nil
-          raise NothingToDo, 'no host given' if not @host and not @group
+          raise NothingToDo, 'no host given' if not @host and not @group and not @regex
           raise NothingToDo, 'nothing to do, give command or -x' if not @cmd and not @opts[:commands]
         end
       end
@@ -85,8 +83,9 @@ module Oxidized
         slop.on 't=', '--timeout',   'timeout value to use'
         slop.on 'e=', '--enable',    'enable password to use'
         slop.on 'c=', '--community', 'snmp community to use for discovery'
-        slop.on 'g=', '--group',     'group to run commands on'
+        slop.on 'g=', '--group',     'group to run commands on (ios, junos, etc), specified in oxidized db'
         slop.on 'r=', '--threads',   'specify ammount of threads to use for running group', default: '1'
+        slop.on       '--regex=',    'run on all hosts that match the regexp'
         slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
@@ -104,6 +103,7 @@ module Oxidized
         @group = slop[:group]
         @threads = slop[:threads]
         @verbose = slop[:verbose]
+        @regex = slop[:regex]
         [slop.parse!, slop]
       end
 
@@ -121,7 +121,7 @@ module Oxidized
         file = file == '-' ? $stdin : File.read(file)
         file.each_line do |line|
           line.chomp!
-          line.sub!(/\\n/, "\n") # tread escaped newline as newline
+          # line.sub!(/\\n/, "\n") # treat escaped newline as newline
           out += @oxs.cmd line
         end
         out
@@ -143,11 +143,36 @@ module Oxidized
         cmds
       end
 
+      def get_hosts
+          if @group and @regex
+            puts "running list for hosts in group: #{@group} and matching: #{@regex}" if @verbose
+            nodes_group = run_group @group
+            nodes_regex = run_regex @regex
+            return nodes_group & nodes_regex
+          elsif @regex
+            puts 'running list for hosts matching: ' + @regex if @verbose
+            return run_regex @regex
+          else
+            puts 'running list for hosts in group: ' + @group if @verbose
+            return run_group @group
+          end
+      end
+
       def run_group group
         Oxidized.mgr = Manager.new
         out = []
         Nodes.new.each do |node|
           next unless group == node.group
+          out << node.name
+        end
+        out
+      end
+
+      def run_regex regex
+        Oxidized.mgr = Manager.new
+        out = []
+        Nodes.new.each do |node|
+          next unless node.name =~ /#{regex}/
           out << node.name
         end
         out
