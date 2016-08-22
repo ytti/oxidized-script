@@ -27,6 +27,14 @@ Default gateway is 62.236.123.198
 Host               Gateway           Last Use    Total Uses  Interface
 ICMP redirect cache is empty
 %IPv4 CEF not running
+
+[nertwork@lan-login2 ~]% oxs --verbose --group ios --threads 4 --regex ^test 'show vrf'
+running list for hosts in group: ios and matching: ^test
+## HOST - test-node-1
+## OXS - show vrf
+Name                             Default RD          Protocols   Interfaces
+  mgmtVRF                          <not set>           ipv4,ipv6   Fa1
+
 [fisakytt@lan-login1 ~]% oxs --help
 Usage: oxs [options] hostname [command]
     -m, --model            host model (ios, junos, etc), otherwise discovered from Oxidized source
@@ -36,8 +44,9 @@ Usage: oxs [options] hostname [command]
     -t, --timeout          timeout value to use
     -e, --enable           enable password to use
     -c, --community        snmp community to use for discovery
-    -g, --group            group to run commands on
+    -g, --group            group to run commands on (ios, junos, etc), specified in oxidized db
     -r, --threads          specify ammount of threads to use for running group (default: 1)
+        --regex    	   run on all hosts that match the regexp
         --protocols        protocols to use, default "ssh, telnet"
     -v, --verbose          verbose output, e.g. show commands sent
     -d, --debug            turn on debugging
@@ -46,6 +55,8 @@ Usage: oxs [options] hostname [command]
         --list-nodes       list nodes in oxidized source
     -h, --help             Display this help message.
 [fisakytt@lan-login1 ~]% 
+
+
 ```
 
 ### Library
