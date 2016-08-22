@@ -18,6 +18,7 @@ module Oxidized
     # @return [String] output for command
     def cmd command
       out = ''
+      out += "## HOST - #{@host}\n" if @verbose
       out += "## OXS - #{command}\n" if @verbose
       cmd_out = @model.cmd command
       out += cmd_out if cmd_out
@@ -34,7 +35,7 @@ module Oxidized
     private
 
     # @param [Hash] opts options for Oxidized::Script
-    # @option opts [String]  :host      hostname or ip address for Oxidized::Node
+    # @option opts [String]  :host      @hostname or ip address for Oxidized::Node
     # @option opts [String]  :model     node model (ios, junos etc) if defined, nodes are not loaded from source
     # @option opts [Fixnum]  :timeout   oxidized timeout
     # @option opts [String]  :username  username for login
@@ -46,13 +47,14 @@ module Oxidized
     # @yieldreturn [self] if called in block, returns self and disconnnects session after exiting block
     # @return [void]
     def initialize opts, &block
-      host        = opts.delete :host
+      @host       = opts.delete :host
       model       = opts.delete :model
       timeout     = opts.delete :timeout
       username    = opts.delete :username
       password    = opts.delete :password
       enable      = opts.delete :enable
       community   = opts.delete :community
+      group       = opts.delete :group
       @verbose    = opts.delete :verbose
       Oxidized.config.input.default = opts.delete :protocols if opts[:protocols]
       raise InvalidOption, "#{opts} not recognized" unless opts.empty?
@@ -64,10 +66,10 @@ module Oxidized
       end
 
       @node = if model
-        Node.new(:name=>host, :model=>model)
-      else
-        Nodes.new(:node=>host).first
-      end
+                Node.new(:name=>@host, :model=>model)
+              else
+                Nodes.new(:node=>@host).first
+              end
       if not @node
         begin
           require 'corona'
@@ -75,9 +77,9 @@ module Oxidized
         rescue LoadError
           raise NoNode, 'node not found'
         end
-        node = Corona.poll :host=>host, :community=>community
+        node = Corona.poll :host=>@host, :community=>community
         raise NoNode, 'node not found' unless node
-        @node = Node.new :name=>host, :model=>node[:model]
+        @node = Node.new :name=>@host, :model=>node[:model]
       end
       @node.auth[:username] = username if username
       @node.auth[:password] = password if password

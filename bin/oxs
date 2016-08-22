@@ -2,7 +2,7 @@
 
 begin
   require 'oxidized/script/cli'
-  puts Oxidized::Script::CLI.new.run
+  Oxidized::Script::CLI.new.run
 rescue => error
   warn "#{error}"
   raise if Oxidized.config.debug
