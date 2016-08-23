@@ -1,3 +1,7 @@
+# 0.3.1
+- FEATURE on --dryrun to get a list of nodes without running a command (by @nertwork)
+- BUGFIX: errors with large config files running in ruby threads - forking instead (by @nertwork)
+
 # 0.3.0
 - FEATURE on --regex to run commands on hosts matching a regex (by @nertwork)
 - FEATURE on -g to run commands on entire group (by @nertwork)

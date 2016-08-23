@@ -1,7 +1,6 @@
 module Oxidized
   require_relative 'script'
   require 'slop'
-  require 'thread'
 
   class Script
     class CLI
@@ -12,29 +11,26 @@ module Oxidized
       def run
         if @group or @regex
           nodes = get_hosts
-          work_q = Queue.new
-          nodes.each{|node| work_q.push node}
-          workers = (0...@threads.to_i).map do
-            Thread.new do
+          counter = @threads.to_i
+          Signal.trap("CLD")  { counter += 1 }
+          nodes.each do |node| 
+            Process.wait if counter <= 0
+            puts "Forking " + node if @verbose
+            counter -= 1
+            fork {
               begin
-                while node = work_q.pop(true)
-                  begin
-                    @host = node
-                    connect
-                    if @opts[:commands]
-                      puts run_file @opts[:commands]
-                    elsif @cmd
-                      puts @oxs.cmd @cmd
-                    end
-                  rescue
-                    puts "Couldn't connect to: " + node
-                  end
+                @host = node
+                connect
+                if @opts[:commands]
+                  puts "Running commands on #{node}:\n#{run_file @opts[:commands]}"
+                elsif @cmd
+                  puts "Running commands on #{node}:\n#{@oxs.cmd @cmd}"
                 end
-              rescue ThreadError
+              rescue => error
+                puts "We had the following error on node #{node}:\n#{error}"
               end
-            end
+            }
           end
-          workers.map(&:join)
         else
           connect
           if @opts[:commands]
@@ -69,6 +65,10 @@ module Oxidized
           end
           @oxs  = nil
           raise NothingToDo, 'no host given' if not @host and not @group and not @regex
+          if @dryrun
+            puts get_hosts
+            exit
+          end
           raise NothingToDo, 'nothing to do, give command or -x' if not @cmd and not @opts[:commands]
         end
       end
@@ -86,6 +86,7 @@ module Oxidized
         slop.on 'g=', '--group',     'group to run commands on (ios, junos, etc), specified in oxidized db'
         slop.on 'r=', '--threads',   'specify ammount of threads to use for running group', default: '1'
         slop.on       '--regex=',    'run on all hosts that match the regexp'
+        slop.on       '--dryrun',    'do a dry run on either groups or regexp to find matching hosts'
         slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
@@ -103,6 +104,7 @@ module Oxidized
         @group = slop[:group]
         @threads = slop[:threads]
         @verbose = slop[:verbose]
+        @dryrun= slop[:dryrun]
         @regex = slop[:regex]
         [slop.parse!, slop]
       end
@@ -144,18 +146,18 @@ module Oxidized
       end
 
       def get_hosts
-          if @group and @regex
-            puts "running list for hosts in group: #{@group} and matching: #{@regex}" if @verbose
-            nodes_group = run_group @group
-            nodes_regex = run_regex @regex
-            return nodes_group & nodes_regex
-          elsif @regex
-            puts 'running list for hosts matching: ' + @regex if @verbose
-            return run_regex @regex
-          else
-            puts 'running list for hosts in group: ' + @group if @verbose
-            return run_group @group
-          end
+        if @group and @regex
+          puts "running list for hosts in group: #{@group} and matching: #{@regex}" if @verbose
+          nodes_group = run_group @group
+          nodes_regex = run_regex @regex
+          return nodes_group & nodes_regex
+        elsif @regex
+          puts 'running list for hosts matching: ' + @regex if @verbose
+          return run_regex @regex
+        else
+          puts 'running list for hosts in group: ' + @group if @verbose
+          return run_group @group
+        end
       end
 
       def run_group group
