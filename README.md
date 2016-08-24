@@ -46,7 +46,8 @@ Usage: oxs [options] hostname [command]
     -c, --community        snmp community to use for discovery
     -g, --group            group to run commands on (ios, junos, etc), specified in oxidized db
     -r, --threads          specify ammount of threads to use for running group (default: 1)
-        --regex    	   run on all hosts that match the regexp
+        --regex            run on all hosts that match the regexp
+        --dryrun           do a dry run on either groups or regexp to find matching hosts
         --protocols        protocols to use, default "ssh, telnet"
     -v, --verbose          verbose output, e.g. show commands sent
     -d, --debug            turn on debugging
