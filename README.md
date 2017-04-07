@@ -38,6 +38,7 @@ Name                             Default RD          Protocols   Interfaces
 [fisakytt@lan-login1 ~]% oxs --help
 Usage: oxs [options] hostname [command]
     -m, --model            host model (ios, junos, etc), otherwise discovered from Oxidized source
+    -o, --ostype           OS Type (ios, junos, etc)
     -x, --commands         commands file to be sent
     -u, --username         username to use
     -p, --password         password to use
