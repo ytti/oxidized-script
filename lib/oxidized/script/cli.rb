@@ -1,6 +1,7 @@
 module Oxidized
   require_relative 'script'
   require 'slop'
+  require 'pp'
 
   class Script
     class CLI
@@ -9,7 +10,7 @@ module Oxidized
       class NothingToDo < ScriptError; end
 
       def run
-        if @group or @regex
+        if @group or @regex or @ostype
           nodes = get_hosts
           counter = @threads.to_i
           Signal.trap("CLD")  { counter += 1 }
@@ -57,14 +58,14 @@ module Oxidized
           @cmd_class.run :args=>@args, :opts=>@opts, :host=>@host, :cmd=>@cmd
           exit 0
         else
-          if @group or @regex
+          if @group or @regex or @ostype
             @cmd = @args.shift
           else
             @host = @args.shift
             @cmd  = @args.shift if @args
           end
           @oxs  = nil
-          raise NothingToDo, 'no host given' if not @host and not @group and not @regex
+          raise NothingToDo, 'no host given' if not @host and not @group and not @ostype and not @regex
           if @dryrun
             puts get_hosts
             exit
@@ -77,6 +78,7 @@ module Oxidized
         slop = Slop.new(:help=>true)
         slop.banner 'Usage: oxs [options] hostname [command]'
         slop.on 'm=', '--model',     'host model (ios, junos, etc), otherwise discovered from Oxidized source'
+        slop.on 'o=', '--ostype',    'OS Type (ios, junos, etc)'
         slop.on 'x=', '--commands',  'commands file to be sent'
         slop.on 'u=', '--username',  'username to use'
         slop.on 'p=', '--password',  'password to use'
@@ -102,6 +104,7 @@ module Oxidized
         end
         slop.parse
         @group = slop[:group]
+        @ostype = slop[:ostype]
         @threads = slop[:threads]
         @verbose = slop[:verbose]
         @dryrun= slop[:dryrun]
@@ -151,9 +154,17 @@ module Oxidized
           nodes_group = run_group @group
           nodes_regex = run_regex @regex
           return nodes_group & nodes_regex
+        elsif @group and @ostype
+          puts "running list for hosts in group: #{@group} and matching: #{@ostype}" if @verbose
+          nodes_group = run_group @group
+          nodes_ostype = run_ostype @ostype
+          return nodes_group & nodes_ostype
         elsif @regex
           puts 'running list for hosts matching: ' + @regex if @verbose
           return run_regex @regex
+        elsif @ostype
+          puts 'running list for hosts matching ostype: ' + @ostype if @verbose
+          return run_ostype @ostype
         else
           puts 'running list for hosts in group: ' + @group if @verbose
           return run_group @group
@@ -165,6 +176,18 @@ module Oxidized
         out = []
         Nodes.new.each do |node|
           next unless group == node.group
+          out << node.name
+        end
+        out
+      end
+
+      def run_ostype ostype
+        Oxidized.mgr = Manager.new
+        out = []
+        Nodes.new.each do |node|
+          ostype.downcase # need to make sure they are both in lowercase
+          nodemodel = node.model.to_s.downcase # need to make sure they are both in lowercase
+          next unless nodemodel =~ /#{ostype}/ 
           out << node.name
         end
         out

@@ -1,3 +1,6 @@
+# 0.3.2
+- FEATURE on --ostype to get a list of nodes that match a particular OS Type (junos, routeros, ios) (by InsaneSplash)
+
 # 0.3.1
 - FEATURE on --dryrun to get a list of nodes without running a command (by @nertwork)
 - BUGFIX: errors with large config files running in ruby threads - forking instead (by @nertwork)

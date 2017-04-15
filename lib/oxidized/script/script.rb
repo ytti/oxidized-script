@@ -37,6 +37,7 @@ module Oxidized
     # @param [Hash] opts options for Oxidized::Script
     # @option opts [String]  :host      @hostname or ip address for Oxidized::Node
     # @option opts [String]  :model     node model (ios, junos etc) if defined, nodes are not loaded from source
+    # @option opts [String]  :ostype	OS Type (ios, junos, etc)
     # @option opts [Fixnum]  :timeout   oxidized timeout
     # @option opts [String]  :username  username for login
     # @option opts [String]  :passsword password for login
@@ -49,6 +50,7 @@ module Oxidized
     def initialize opts, &block
       @host       = opts.delete :host
       model       = opts.delete :model
+      ostype      = opts.delete :ostype
       timeout     = opts.delete :timeout
       username    = opts.delete :username
       password    = opts.delete :password
