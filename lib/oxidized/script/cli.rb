@@ -1,7 +1,6 @@
 module Oxidized
   require_relative 'script'
   require 'slop'
-  require 'pp'
 
   class Script
     class CLI
