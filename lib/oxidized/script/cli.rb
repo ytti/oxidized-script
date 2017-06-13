@@ -10,6 +10,7 @@ module Oxidized
 
       def run
         if @group or @regex or @ostype
+          $stdout.sync = true
           nodes = get_hosts
           counter = @threads.to_i
           Signal.trap("CLD")  { counter += 1 }
@@ -31,6 +32,7 @@ module Oxidized
               end
             }
           end
+          Process.waitall
         else
           connect
           if @opts[:commands]
