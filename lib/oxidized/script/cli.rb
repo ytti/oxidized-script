@@ -150,13 +150,24 @@ module Oxidized
       end
 
       def get_hosts
-        if @group and @regex
+        if @ostype and @group and @regex
+          puts "running list for hosts in group: #{@group} and matching ostype: #{@ostype} and matching: #{@regex}" if @verbose
+          nodes_group = run_group @group
+          nodes_ostype = run_ostype @ostype
+          nodes_regex = run_regex @regex
+          return nodes_group & nodes_regex & nodes_ostype
+        elsif @group and @regex
           puts "running list for hosts in group: #{@group} and matching: #{@regex}" if @verbose
           nodes_group = run_group @group
           nodes_regex = run_regex @regex
           return nodes_group & nodes_regex
+        elsif @regex and @ostype
+          puts "running list for hosts matching ostype: #{@ostype} and matching: #{@regex}" if @verbose
+          nodes_regex = run_regex @regex
+          nodes_ostype = run_ostype @ostype
+          return nodes_regex & nodes_ostype
         elsif @group and @ostype
-          puts "running list for hosts in group: #{@group} and matching: #{@ostype}" if @verbose
+          puts "running list for hosts in group: #{@group} and matching ostype: #{@ostype}" if @verbose
           nodes_group = run_group @group
           nodes_ostype = run_ostype @ostype
           return nodes_group & nodes_ostype
