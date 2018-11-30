@@ -151,21 +151,31 @@ module Oxidized
 
       def get_hosts
         puts "running list for hosts" if @verbose
+        if @group
+          puts " - in group: #{@group}" if @verbose
+        end
+        if @ostype
+          puts " - (and) matching ostype: #{@ostype}" if @verbose
+        end
+        if @regex
+          puts " - (and) matching: #{@regex}" if @verbose
+        end
         Oxidized.mgr = Manager.new
         out = []
+        loop_verbose=0   # turn on/off verbose output for the following loop
         Nodes.new.each do |node|
           if @group
-            puts " - in group: #{@group}" if @verbose
+            puts " ... checking if #{node.name} in group: #{@group}, node group is: #{node.group}" if @verbose and loop_verbose>0
             next unless @group == node.group
           end
           if @ostype
-            puts " - (and) matching ostype: #{@ostype}" if @verbose
             @ostype.downcase # need to make sure they are both in lowercase
             nodemodel = node.model.to_s.downcase # need to make sure they are both in lowercase
+            puts " ... checking if #{node.name} matching ostype: #{@ostype}, node ostype is: #{nodemodel}" if @verbose and loop_verbose>0
             next unless nodemodel =~ /#{@ostype}/
           end
           if @regex
-            puts " - (and) matching: #{@regex}" if @verbose
+            puts " ... checking if if #{node.name} matching: #{@regex}" if @verbose and loop_verbose>0
             next unless node.name =~ /#{@regex}/
           end
           out << node.name
