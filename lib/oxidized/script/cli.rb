@@ -150,55 +150,34 @@ module Oxidized
       end
 
       def get_hosts
-        if @group and @regex
-          puts "running list for hosts in group: #{@group} and matching: #{@regex}" if @verbose
-          nodes_group = run_group @group
-          nodes_regex = run_regex @regex
-          return nodes_group & nodes_regex
-        elsif @group and @ostype
-          puts "running list for hosts in group: #{@group} and matching: #{@ostype}" if @verbose
-          nodes_group = run_group @group
-          nodes_ostype = run_ostype @ostype
-          return nodes_group & nodes_ostype
-        elsif @regex
-          puts 'running list for hosts matching: ' + @regex if @verbose
-          return run_regex @regex
-        elsif @ostype
-          puts 'running list for hosts matching ostype: ' + @ostype if @verbose
-          return run_ostype @ostype
-        else
-          puts 'running list for hosts in group: ' + @group if @verbose
-          return run_group @group
+        puts "running list for hosts" if @verbose
+        if @group
+          puts " - in group: #{@group}" if @verbose
         end
-      end
-
-      def run_group group
+        if @ostype
+          puts " - (and) matching ostype: #{@ostype}" if @verbose
+        end
+        if @regex
+          puts " - (and) matching: #{@regex}" if @verbose
+        end
         Oxidized.mgr = Manager.new
         out = []
+        loop_verbose=0   # turn on/off verbose output for the following loop
         Nodes.new.each do |node|
-          next unless group == node.group
-          out << node.name
-        end
-        out
-      end
-
-      def run_ostype ostype
-        Oxidized.mgr = Manager.new
-        out = []
-        Nodes.new.each do |node|
-          ostype.downcase # need to make sure they are both in lowercase
-          nodemodel = node.model.to_s.downcase # need to make sure they are both in lowercase
-          next unless nodemodel =~ /#{ostype}/ 
-          out << node.name
-        end
-        out
-      end
-
-      def run_regex regex
-        Oxidized.mgr = Manager.new
-        out = []
-        Nodes.new.each do |node|
-          next unless node.name =~ /#{regex}/
+          if @group
+            puts " ... checking if #{node.name} in group: #{@group}, node group is: #{node.group}" if @verbose and loop_verbose>0
+            next unless @group == node.group
+          end
+          if @ostype
+            @ostype.downcase # need to make sure they are both in lowercase
+            nodemodel = node.model.to_s.downcase # need to make sure they are both in lowercase
+            puts " ... checking if #{node.name} matching ostype: #{@ostype}, node ostype is: #{nodemodel}" if @verbose and loop_verbose>0
+            next unless nodemodel =~ /#{@ostype}/
+          end
+          if @regex
+            puts " ... checking if if #{node.name} matching: #{@regex}" if @verbose and loop_verbose>0
+            next unless node.name =~ /#{@regex}/
+          end
           out << node.name
         end
         out
