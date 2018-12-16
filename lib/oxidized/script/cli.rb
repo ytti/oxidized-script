@@ -13,8 +13,8 @@ module Oxidized
           $stdout.sync = true
           nodes = get_hosts
           counter = @threads.to_i
-          Signal.trap("CLD")  { counter += 1 }
-          nodes.each do |node| 
+          Signal.trap("CLD") { counter += 1 }
+          nodes.each do |node|
             Process.wait if counter <= 0
             puts "Forking " + node if @verbose
             counter -= 1
@@ -76,7 +76,7 @@ module Oxidized
       end
 
       def opts_parse cmds
-        slop = Slop.new(:help=>true)
+        slop = Slop.new(help: true)
         slop.banner 'Usage: oxs [options] hostname [command]'
         slop.on 'm=', '--model',     'host model (ios, junos, etc), otherwise discovered from Oxidized source'
         slop.on 'o=', '--ostype',    'OS Type (ios, junos, etc)'
@@ -108,7 +108,7 @@ module Oxidized
         @ostype = slop[:ostype]
         @threads = slop[:threads]
         @verbose = slop[:verbose]
-        @dryrun= slop[:dryrun]
+        @dryrun = slop[:dryrun]
         @regex = slop[:regex]
         [slop.parse!, slop]
       end
@@ -144,7 +144,7 @@ module Oxidized
           cmd = Script::Command.const_get cmd
           name = cmd.const_get :Name
           desc = cmd.const_get :Description
-          cmds << {:class=>cmd, :name=>name, :description=>desc}
+          cmds << { class: cmd, name: name, description: desc }
         end
         cmds
       end
@@ -162,21 +162,19 @@ module Oxidized
         end
         Oxidized.mgr = Manager.new
         out = []
-        loop_verbose=0   # turn on/off verbose output for the following loop
+        loop_verbose = false # turn on/off verbose output for the following loop
         Nodes.new.each do |node|
           if @group
-            puts " ... checking if #{node.name} in group: #{@group}, node group is: #{node.group}" if @verbose and loop_verbose>0
+            puts " ... checking if #{node.name} in group: #{@group}, node group is: #{node.group}" if loop_verbose
             next unless @group == node.group
           end
           if @ostype
-            @ostype.downcase # need to make sure they are both in lowercase
-            nodemodel = node.model.to_s.downcase # need to make sure they are both in lowercase
-            puts " ... checking if #{node.name} matching ostype: #{@ostype}, node ostype is: #{nodemodel}" if @verbose and loop_verbose>0
-            next unless nodemodel =~ /#{@ostype}/
+            puts " ... checking if #{node.name} matching ostype: #{@ostype}, node ostype is: #{node.model.to_s}" if loop_verbose
+            next unless node.model.to_s.match(/#{@ostype}/i)
           end
           if @regex
-            puts " ... checking if if #{node.name} matching: #{@regex}" if @verbose and loop_verbose>0
-            next unless node.name =~ /#{@regex}/
+            puts " ... checking if if #{node.name} matching: #{@regex}" if loop_verbose
+            next unless node.name.match(/#{@regex}/)
           end
           out << node.name
         end
