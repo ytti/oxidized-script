@@ -17,5 +17,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'slop',        '~> 3.5'
   s.add_development_dependency 'bundler', '~> 2.0'
   s.add_development_dependency 'rake',    '~> 10.0'
-  s.add_development_dependency 'rubocop', '~> 0.80.0'
+  s.add_development_dependency 'rubocop', '~> 0.81.0'
 end
