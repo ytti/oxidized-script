@@ -1,5 +1,11 @@
 inherit_from: .rubocop_todo.yml
 
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
 Style/HashEachMethods:
   Enabled: true
 
