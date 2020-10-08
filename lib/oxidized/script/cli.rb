@@ -126,7 +126,6 @@ module Oxidized
         out = ''
         file = file == '-' ? $stdin : File.read(file)
         file.each_line do |line|
-          line.chomp!
           # line.sub!(/\\n/, "\n") # treat escaped newline as newline
           out += @oxs.cmd line
         end
