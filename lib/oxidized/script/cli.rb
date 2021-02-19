@@ -91,6 +91,7 @@ module Oxidized
         slop.on       '--regex=',    'run on all hosts that match the regexp'
         slop.on       '--dryrun',    'do a dry run on either groups or regexp to find matching hosts'
         slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
+        slop.on       '--no-trim',   'Dont trim newlines and whitespace when running commands'
         slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
         slop.on 'd',  '--debug',     'turn on debugging'
         slop.on :terse, 'display clean output'
@@ -126,8 +127,8 @@ module Oxidized
         out = ''
         file = file == '-' ? $stdin : File.read(file)
         file.each_line do |line|
-          line.chomp!
           # line.sub!(/\\n/, "\n") # treat escaped newline as newline
+          line.chomp! unless @opts["no-trim"]
           out += @oxs.cmd line
         end
         out
