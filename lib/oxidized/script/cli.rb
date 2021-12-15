@@ -76,42 +76,47 @@ module Oxidized
       end
 
       def opts_parse cmds
-        slop = Slop.new(help: true)
-        slop.banner 'Usage: oxs [options] hostname [command]'
-        slop.on 'm=', '--model',     'host model (ios, junos, etc), otherwise discovered from Oxidized source'
-        slop.on 'o=', '--ostype',    'OS Type (ios, junos, etc)'
-        slop.on 'x=', '--commands',  'commands file to be sent'
-        slop.on 'u=', '--username',  'username to use'
-        slop.on 'p=', '--password',  'password to use'
-        slop.on 't=', '--timeout',   'timeout value to use'
-        slop.on 'e=', '--enable',    'enable password to use'
-        slop.on 'c=', '--community', 'snmp community to use for discovery'
-        slop.on 'g=', '--group',     'group to run commands on (ios, junos, etc), specified in oxidized db'
-        slop.on 'r=', '--threads',   'specify ammount of threads to use for running group', default: '1'
-        slop.on       '--regex=',    'run on all hosts that match the regexp'
-        slop.on       '--dryrun',    'do a dry run on either groups or regexp to find matching hosts'
-        slop.on       '--protocols=','protocols to use, default "ssh, telnet"'
-        slop.on       '--no-trim',   'Dont trim newlines and whitespace when running commands'
-        slop.on 'v',  '--verbose',   'verbose output, e.g. show commands sent'
-        slop.on 'd',  '--debug',     'turn on debugging'
-        slop.on :terse, 'display clean output'
-        cmds.each do |cmd|
-          if cmd[:class].respond_to? :cmdline
-            cmd[:class].cmdline slop, self
-          else
-            slop.on cmd[:name], cmd[:description] do
-              @cmd_class = cmd[:class]
+        opts = Slop.parse do |opt|
+          opt.banner = 'Usage: oxs [options] hostname [command]'
+          opt.on '-h', '--help', 'show usage' do
+            puts opt
+            exit
+          end
+          opt.string '-m', '--model',     'host model (ios, junos, etc), otherwise discovered from Oxidized source'
+          opt.string '-o', '--ostype',    'OS Type (ios, junos, etc)'
+          opt.string '-x', '--commands',  'commands file to be sent'
+          opt.string '-u', '--username',  'username to use'
+          opt.string '-p', '--password',  'password to use'
+          opt.int '-t', '--timeout',   'timeout value to use'
+          opt.string '-e', '--enable',    'enable password to use'
+          opt.string '-c', '--community', 'snmp community to use for discovery'
+          opt.string '-g', '--group',     'group to run commands on (ios, junos, etc), specified in oxidized db'
+          opt.int '-r', '--threads',   'specify ammount of threads to use for running group', default: '1'
+          opt.string       '--regex',    'run on all hosts that match the regexp'
+          opt.on       '--dryrun',    'do a dry run on either groups or regexp to find matching hosts'
+          opt.string       '--protocols','protocols to use, default "ssh, telnet"'
+          opt.on       '--no-trim',   'Dont trim newlines and whitespace when running commands'
+          opt.on '-v',  '--verbose',   'verbose output, e.g. show commands sent'
+          opt.on '-d',  '--debug',     'turn on debugging'
+          opt.on :terse, 'display clean output'
+
+          cmds.each do |cmd|
+            if cmd[:class].respond_to? :cmdline
+              cmd[:class].cmdline opt, self
+            else
+              opt.on "--" + cmd[:name], cmd[:description] do
+                @cmd_class = cmd[:class]
+              end
             end
           end
         end
-        slop.parse
-        @group = slop[:group]
-        @ostype = slop[:ostype]
-        @threads = slop[:threads]
-        @verbose = slop[:verbose]
-        @dryrun = slop[:dryrun]
-        @regex = slop[:regex]
-        [slop.parse!, slop]
+        @group = opts[:group]
+        @ostype = opts[:ostype]
+        @threads = opts[:threads]
+        @verbose = opts[:verbose]
+        @dryrun = opts[:dryrun]
+        @regex = opts[:regex]
+        [opts.arguments, opts]
       end
 
       def connect
