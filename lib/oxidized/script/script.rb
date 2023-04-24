@@ -9,10 +9,10 @@ module Oxidized
     class ScriptError   < OxidizedError; end
     class NoNode        < ScriptError;   end
     class InvalidOption < ScriptError;   end
+
     class NoConnection  < ScriptError
       attr_accessor :node_error
     end
-
 
     # @param [String] command command to be sent
     # @return [String] output for command
@@ -99,13 +99,11 @@ module Oxidized
     def connect
       node_error = {}
       @node.input.each do |input|
-        begin
-          @node.model.input = input.new
-          @node.model.input.connect @node
-          break
-        rescue => error
-          node_error[input] = error
-        end
+        @node.model.input = input.new
+        @node.model.input.connect @node
+        break
+      rescue => error
+        node_error[input] = error
       end
       @input = @node.model.input
       err = NoConnection.new

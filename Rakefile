@@ -21,7 +21,7 @@ end
 
 desc 'Install gem'
 task install: :build do
-  system "sudo -Es sh -c \'umask 022; gem install gems/#{gemfile}\'"
+  system "sudo -Es sh -c 'umask 022; gem install gems/#{gemfile}'"
 end
 
 task build: :chmod
