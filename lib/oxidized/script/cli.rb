@@ -5,6 +5,7 @@ module Oxidized
   class Script
     class CLI
       attr_accessor :cmd_class
+
       class CLIError < ScriptError; end
       class NothingToDo < ScriptError; end
 
@@ -92,10 +93,10 @@ module Oxidized
           opt.string '-c', '--community', 'snmp community to use for discovery'
           opt.string '-g', '--group',     'group to run commands on (ios, junos, etc), specified in oxidized db'
           opt.int '-r', '--threads',   'specify ammount of threads to use for running group', default: '1'
-          opt.string       '--regex',    'run on all hosts that match the regexp'
-          opt.on       '--dryrun',    'do a dry run on either groups or regexp to find matching hosts'
-          opt.string       '--protocols','protocols to use, default "ssh, telnet"'
-          opt.on       '--no-trim',   'Dont trim newlines and whitespace when running commands'
+          opt.string '--regex',    'run on all hosts that match the regexp'
+          opt.on '--dryrun',    'do a dry run on either groups or regexp to find matching hosts'
+          opt.string '--protocols','protocols to use, default "ssh, telnet"'
+          opt.on '--no-trim',   'Dont trim newlines and whitespace when running commands'
           opt.on '-v',  '--verbose',   'verbose output, e.g. show commands sent'
           opt.on '-d',  '--debug',     'turn on debugging'
           opt.on :terse, 'display clean output'
@@ -157,14 +158,14 @@ module Oxidized
 
       def get_hosts
         puts "running list for hosts" if @verbose
-        if @group
-          puts " - in group: #{@group}" if @verbose
+        if @group && @verbose
+          puts " - in group: #{@group}"
         end
-        if @ostype
-          puts " - (and) matching ostype: #{@ostype}" if @verbose
+        if @ostype && @verbose
+          puts " - (and) matching ostype: #{@ostype}"
         end
-        if @regex
-          puts " - (and) matching: #{@regex}" if @verbose
+        if @regex && @verbose
+          puts " - (and) matching: #{@regex}"
         end
         Oxidized.mgr = Manager.new
         out = []
