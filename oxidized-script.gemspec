@@ -12,9 +12,12 @@ Gem::Specification.new do |s|
   s.executables       = %w[oxs]
   s.require_path      = 'lib'
 
-  s.add_runtime_dependency 'oxidized',    '~> 0.28'
+  s.required_ruby_version = '>= 3.1'
+
+  s.add_runtime_dependency 'oxidized',    '~> 0.31'
   s.add_runtime_dependency 'slop',        '~> 4.6'
-  s.add_development_dependency 'bundler', '~> 2.0'
-  s.add_development_dependency 'rake',    '~> 10.0'
+
+  s.add_development_dependency 'bundler', '~> 2.2'
+  s.add_development_dependency 'rake',    '~> 13.0'
   s.add_development_dependency 'rubocop', '~> 1.70.0'
 end
