@@ -1,5 +1,9 @@
 inherit_from: .rubocop_todo.yml
 
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+
 Lint/RaiseException:
   Enabled: true
 
@@ -15,3 +19,6 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+require:
+  - rubocop-rake
+  - rubocop-minitest
