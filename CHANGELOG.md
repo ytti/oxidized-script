@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.7.0 - 2025-01-21]
 
 ### Added
 - Added no-trim option (@Gman98ish)
@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - update gemspec dependencies (@nickhilliard)
 - updates + sanity checking on gh actions (@nickhilliard)
 
-## 0.6.0
+## [0.6.0 - 2018-12-16]
 
 ### Added
 - Implemented combination of regex with ostype (@LarsKollstedt)
@@ -23,12 +23,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - refactor some code (@ytti)
 - updated oxidized dependency (@ytti)
 
-## 0.5.1
+## [0.5.1 - 2018-06-03]
 
 ### Fixed
 - fixed oxidized dependency (@ytti)
 
-## 0.5.0
+## [0.5.0 - 2017-11-01]
 
 ### Fixed
 - adding in sync for stdout giving more control over individual changes (@nertwork)
