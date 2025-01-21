@@ -14,9 +14,9 @@ Gem::Specification.new do |s|
 
   s.metadata['rubygems_mfa_required'] = 'true'
 
-  s.required_ruby_version = '>= 3.1'
+  s.required_ruby_version = '>= 3.0'
 
-  s.add_runtime_dependency 'oxidized',    '~> 0.31'
+  s.add_runtime_dependency 'oxidized',    '~> 0.29'
   s.add_runtime_dependency 'slop',        '~> 4.6'
 
   s.add_development_dependency 'bundler',             '~> 2.2'
