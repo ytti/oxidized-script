@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - TODO.md - a list of future aspirations for some brave spirit with both time and willingness
 
+### Fixed
+- fixed --list-models (@nickhilliard)
+- return exception if host specification line returns no hosts (@nickhilliard)
+
 ## [0.7.0 - 2025-01-21]
 
 ### Added
