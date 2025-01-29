@@ -72,6 +72,7 @@ module Oxidized
             exit
           end
           raise NothingToDo, 'nothing to do, give command or -x' if not @cmd and not @opts[:commands]
+          raise NothingToDo, 'nothing to do, no hosts matched' if get_hosts.empty?
         end
       end
 
