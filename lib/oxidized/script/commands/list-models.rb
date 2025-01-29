@@ -11,7 +11,7 @@ module Oxidized
 
         def models
           out = ''
-          models = Dir.glob File.join Config::ModelDir, '*.rb'
+          models = Dir.glob File.join Config::MODEL_DIR, '*.rb'
           models.each do |model|
             out += "%15s - %s\n" % [File.basename(model, '.rb'), model]
           end
