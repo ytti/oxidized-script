@@ -49,7 +49,6 @@ module Oxidized
         @args, @opts = opts_parse load_dynamic
 
         Config.load(@opts)
-        Oxidized.setup_logger
 
         if @opts[:commands]
           Oxidized.config.vars.ssh_no_exec = true
