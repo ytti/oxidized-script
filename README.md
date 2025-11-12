@@ -69,7 +69,6 @@ Usage: oxs [options] hostname [command]
 require 'oxidized/script'
 
 Oxidized::Config.load
-Oxidized.setup_logger
 
 Oxidized::Script.new(:host=>'62.236.123.199') do |oxs|
   puts oxs.cmd 'show mac address-table dynamic vlan 101'

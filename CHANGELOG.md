@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - fixed --list-models (@nickhilliard)
 - return exception if host specification line returns no hosts (@nickhilliard)
+- Remove Oxidized.setup_logger from CLI initialization (@nickhilliard)
 
 ## [0.7.0 - 2025-01-21]
 
