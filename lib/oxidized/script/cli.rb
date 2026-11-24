@@ -167,6 +167,7 @@ module Oxidized
           puts " - (and) matching: #{@regex}" if @verbose
         end
         Oxidized.mgr = Manager.new
+        Oxidized.hooks = HookManager.from_config(Oxidized.config)
         out = []
         loop_verbose = false # turn on/off verbose output for the following loop
         Nodes.new.each do |node|
